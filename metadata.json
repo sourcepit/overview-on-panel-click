@@ -1,0 +1,7 @@
+{
+  "name": "Overview on Panel Click",
+  "description": "Toggle overview by right clicking on top panel.",
+  "uuid": "overview-on-panel-click@sourcepit.org",
+  "shell-version": ["48"],
+  "version-name": "1"
+}
