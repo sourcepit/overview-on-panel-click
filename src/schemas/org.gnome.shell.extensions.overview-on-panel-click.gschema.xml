@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema id="org.gnome.shell.extensions.overview-on-panel-click" path="/org/gnome/shell/extensions/overview-on-panel-click/">
-    <key name="show-indicator" type="b">
-      <default>true</default>
+    <key name="click-workflow" type="s">
+      <default>'right-click-only'</default>
+      <summary>Click Mode</summary>
+      <description>Choose between 'right-left-click' (right-left-click Click) or 'right-click-only' (Right Click Only) modes.</description>
     </key>
   </schema>
 </schemalist>

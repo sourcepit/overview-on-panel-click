@@ -10,57 +10,59 @@ import {
 
 export default class ExamplePreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
-        // Create a preferences page, with a single group
+        const workflows = [
+            {key: 'right-click-only', label: 'Right Click Only'},
+            {key: 'right-left-click', label: 'Right Left Click'},
+        ];
+
+        const settings = this.getSettings();
+
         const page = new Adw.PreferencesPage({
-            title: _('General'),
-            icon_name: 'dialog-information-symbolic',
+            title: 'Settings',
+            icon_name: 'preferences-system-symbolic',
         });
         window.add(page);
 
         const group = new Adw.PreferencesGroup({
-            title: _('Appearance'),
-            description: _('Configure the appearance of the extension'),
+            title: 'Behavior',
+            description:
+                "Note: Gnome intentionally forwards clicks on empty panel areas to maximized windows — for example, to support features like window unmaximizing. Therefore, this extension unfortunately cannot offer a 'Right Click Only' workflow.",
         });
         page.add(group);
 
-        // Create a new preferences row
-        const row = new Adw.SwitchRow({
-            title: _('Show Indicator'),
-            subtitle: _('Whether to show the panel indicator'),
-        });
-        group.add(row);
+        const keys = workflows.map((option) => option.key);
+        const labels = workflows.map((option) => option.label);
 
-        const options = [
-            {id: 'right-left', label: 'Right-Left Click'},
-            {id: 'right-only', label: 'Right Click Only'},
-        ];
+        let activeKey = settings.get_string('click-workflow');
 
-        const ids = options.map((option) => option.id);
-        const labels = options.map((option) => option.label);
+        let activeIndex = keys.indexOf(activeKey);
+        if (activeIndex === -1) {
+            activeIndex = 0;
+            const invalidKey = activeKey;
+            activeKey = keys[activeIndex];
+            log(
+                `[overview-on-panel-click] WARNING: Unexpected click-workflow setting: "${invalidKey}". Falling back to "${activeKey}".`,
+            );
+            settings.set_string('click-workflow', activeKey);
+        }
 
-        const comboRow = new Adw.ComboRow({
-            title: 'Auswahl',
-            subtitle: 'foo',
+        const row = new Adw.ComboRow({
+            title: 'Click Workflow',
+            subtitle: 'Choose your preferred click workflow.',
             model: Gtk.StringList.new(labels),
         });
-        comboRow.model.get_item;
 
-        comboRow.connect('notify::selected-item', () => {
-            const index = comboRow.get_selected();
-            const id = ids[index];
-            print(`Ausgewählt: ${id}`);
+        row.set_selected(activeIndex);
+
+        row.connect('notify::selected-item', () => {
+            const index = row.get_selected();
+            const key = keys[index];
+            log(`[overview-on-panel-click] set 'click-workflow' to ${key}`);
+            settings.set_string('click-workflow', key);
         });
 
-        comboRow.add;
-        group.add(comboRow);
+        group.add(row);
 
-        // Create a settings object and bind the row to the `show-indicator` key
-        window._settings = this.getSettings();
-        window._settings.bind(
-            'show-indicator',
-            row,
-            'active',
-            Gio.SettingsBindFlags.DEFAULT,
-        );
+        window._settings = settings;
     }
 }
