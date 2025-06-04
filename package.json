@@ -3,6 +3,7 @@
   "scripts": {
     "build": "./scripts/build.sh",
     "build:dev": "./scripts/build.sh --unsafe-reload",
+    "build:stage": "./scripts/build.sh && ./scripts/stage.sh",
     "build:install": "./scripts/build.sh --install",
     "check:lint": "eslint src/**/*.js",
     "check:format": "prettier --check src/**/*.js"
