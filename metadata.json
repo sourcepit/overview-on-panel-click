@@ -3,5 +3,6 @@
   "description": "Toggle overview by right clicking on top panel.",
   "uuid": "overview-on-panel-click@sourcepit.org",
   "shell-version": ["48"],
-  "version-name": "1"
+  "version-name": "1",
+  "settings-schema": "org.gnome.shell.extensions.overview-on-panel-click"
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.overview-on-panel-click" path="/org/gnome/shell/extensions/overview-on-panel-click/">
+    <key name="click-workflow" type="s">
+      <default>'right-left-click'</default>
+      <summary>Click Workflow</summary>
+      <description>Choose between 'right-left-click' or 'right-click-only'.</description>
+    </key>
+  </schema>
+</schemalist>

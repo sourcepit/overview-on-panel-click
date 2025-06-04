@@ -1,6 +1,9 @@
+import Clutter from 'gi://Clutter';
+
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
-import Clutter from 'gi://Clutter';
+
+import {ClickWorkflow, SettingsKey} from './core.js';
 
 class PanelClickToggleExtension extends Extension {
     _clickSignalId = null;
@@ -24,32 +27,48 @@ class PanelClickToggleExtension extends Extension {
                     const button = event.get_button();
                     const overviewVisible = Main.overview.visible;
 
-                    // Unfortunately, in Gnome (with Wayland?), it's not possible to receive
-                    // left-clicks on an empty space in the panel when a window is currently
-                    // maximized. The events are sent to the maximized window. This is a design
-                    // decision by Gnome to enable various features, such as shrinking maximized
-                    // windows using the panel. As a workaround, this extension implements a
-                    // right-left-click workflow that is intended to integrate with Gnome's
-                    // behavior.
-                    if (overviewVisible && button === Clutter.BUTTON_PRIMARY) {
-                        log(
-                            '[overview-on-panel-click] closing overview with left click',
-                        );
-                        Main.overview.toggle();
-                        return Clutter.EVENT_STOP;
-                    } else if (
-                        !overviewVisible &&
-                        button === Clutter.BUTTON_SECONDARY
-                    ) {
-                        log(
-                            '[overview-on-panel-click] opening overview with right click',
-                        );
-                        Main.overview.toggle();
-                        return Clutter.EVENT_STOP;
+                    const workflow = this.getSettings().get_string(
+                        SettingsKey.CLICK_WORKFLOW,
+                    );
+
+                    if (workflow === ClickWorkflow.RIGHT_CLICK_ONLY) {
+                        if (button === Clutter.BUTTON_SECONDARY) {
+                            log(
+                                `[overview-on-panel-click] toggling overview with right click (right click only mode, overviewVisible=${overviewVisible})`,
+                            );
+                            Main.overview.toggle();
+                            return Clutter.EVENT_STOP;
+                        } else {
+                            log(
+                                `[overview-on-panel-click] click ignored (button=${button}, overviewVisible=${overviewVisible}, mode=right-click-only)`,
+                            );
+                        }
+                    } else if (workflow === ClickWorkflow.RIGHT_LEFT_CLICK) {
+                        if (
+                            overviewVisible &&
+                            button === Clutter.BUTTON_PRIMARY
+                        ) {
+                            log(
+                                '[overview-on-panel-click] closing overview with left click',
+                            );
+                            Main.overview.toggle();
+                            return Clutter.EVENT_STOP;
+                        } else if (
+                            !overviewVisible &&
+                            button === Clutter.BUTTON_SECONDARY
+                        ) {
+                            log(
+                                '[overview-on-panel-click] opening overview with right click',
+                            );
+                            Main.overview.toggle();
+                            return Clutter.EVENT_STOP;
+                        } else {
+                            log(
+                                `[overview-on-panel-click] click ignored (button=${button}, overviewVisible=${overviewVisible})`,
+                            );
+                        }
                     } else {
-                        log(
-                            `[overview-on-panel-click] click ignored (button=${button}, overviewVisible=${overviewVisible})`,
-                        );
+                        return Clutter.EVENT_PROPAGATE;
                     }
                 }
                 return Clutter.EVENT_PROPAGATE;
